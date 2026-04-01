@@ -6,6 +6,7 @@
     "start": "expo start",
     "start:tunnel": "expo start --tunnel",
     "build:web": "expo export -p web",
+    "site-links": "node scripts/print-site-links.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"

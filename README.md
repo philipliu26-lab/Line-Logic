@@ -108,7 +108,7 @@ Copy your live **`https://…`** link → paste it into any **QR code generator*
 
 This repo includes **GitHub Actions** (`.github/workflows/deploy-web.yml`) that builds the web app and deploys it to **GitHub Pages** whenever you push to **`main`** or **`master`**.
 
-1. Create a **new repository** on GitHub and push this project (or push from your machine):
+1. Create a **new repository** on GitHub named **`Line-Logic`** (recommended) and push this project:
 
    ```bash
    cd line-logic
@@ -116,7 +116,7 @@ This repo includes **GitHub Actions** (`.github/workflows/deploy-web.yml`) that 
    git add .
    git commit -m "Line Logic MVP"
    git branch -M main
-   git remote add origin https://github.com/YOUR_USER/YOUR_REPO.git
+   git remote add origin https://github.com/YOUR_USER/Line-Logic.git
    git push -u origin main
    ```
 
@@ -124,9 +124,9 @@ This repo includes **GitHub Actions** (`.github/workflows/deploy-web.yml`) that 
 
 3. Open the **Actions** tab and wait for **Deploy web to GitHub Pages** to finish (green).
 
-4. Your public URL will be:
+4. Your public URL will look like:
 
-   `https://YOUR_USER.github.io/YOUR_REPO/`
+   `https://YOUR_USER.github.io/Line-Logic/`
 
    (The workflow sets `EXPO_ROUTER_BASE_PATH` to match the repo name so assets load correctly.)
 
