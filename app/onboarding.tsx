@@ -32,6 +32,7 @@ export default function OnboardingScreen() {
   const c = Colors[scheme];
   const { completeOnboarding } = useApp();
   const [page, setPage] = useState(0);
+  const [ctaPressed, setCtaPressed] = useState(false);
 
   const finish = async () => {
     await completeOnboarding();
@@ -75,7 +76,9 @@ export default function OnboardingScreen() {
           </Text>
           <Pressable
             onPress={isLast ? finish : () => setPage((p) => p + 1)}
-            style={({ pressed }) => [styles.cta, { opacity: pressed ? 0.65 : 1 }]}
+            onPressIn={() => setCtaPressed(true)}
+            onPressOut={() => setCtaPressed(false)}
+            style={[styles.cta, { opacity: ctaPressed ? 0.65 : 1 }]}
             accessibilityRole="button"
             accessibilityLabel={isLast ? 'Get started' : 'Next'}>
             <Text style={[styles.ctaText, { color: c.accent }]}>

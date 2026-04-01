@@ -16,7 +16,7 @@ import {
   type SubscriptionTier,
 } from '@/lib/pickUsage';
 import { persistentStorage } from '@/lib/persistentStorage';
-import { STORAGE_ONBOARDING, STORAGE_TIER } from '@/lib/storageKeys';
+import { STORAGE_TIER } from '@/lib/storageKeys';
 
 type AppContextValue = {
   tier: SubscriptionTier;
@@ -43,14 +43,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const [t, ob, usage] = await Promise.all([
+        const [t, usage] = await Promise.all([
           persistentStorage.getItem(STORAGE_TIER),
-          persistentStorage.getItem(STORAGE_ONBOARDING),
           loadPickUsage(),
         ]);
         if (cancelled) return;
         if (t === 'pro' || t === 'elite' || t === 'base') setTierState(t);
-        setOnboardingComplete(ob === 'true');
         setPickUsage(usage);
       } finally {
         if (!cancelled) setReady(true);
@@ -66,8 +64,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await persistentStorage.setItem(STORAGE_TIER, t);
   }, []);
 
+  // Intentionally not persisted: each full app load shows the 3 intro slides again.
   const completeOnboarding = useCallback(async () => {
-    await persistentStorage.setItem(STORAGE_ONBOARDING, 'true');
     setOnboardingComplete(true);
   }, []);
 

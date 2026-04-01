@@ -149,7 +149,7 @@ This repo includes **GitHub Actions** (`.github/workflows/deploy-web.yml`) that 
 
 ## Persistence & daily pick limits
 
-- **Subscription tier** (Base / Pro / Elite) and **onboarding completion** are stored with `@react-native-async-storage/async-storage` when the native module is available.
+- **Subscription tier** (Base / Pro / Elite) is stored with `@react-native-async-storage/async-storage` when the native module is available. The **three intro slides** run on each full visit (onboarding completion is not saved).
 - If AsyncStorage isn’t available (some Expo Go setups), the app falls back to **in-memory storage** for that session so **Get started** and picks still work; closing the app fully may reset that session state.
 - **AI pick reveals** per day: Base **3**, Pro **15**, Elite **high cap**. Count resets when the device’s **local calendar date** changes (see `lib/pickUsage.ts`).
 
