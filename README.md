@@ -165,3 +165,4 @@ This is an **educational prototype**. It is **not** gambling or financial advice
 
 For store-ready binaries you’d use [EAS Build](https://docs.expo.dev/build/introduction/) (`eas build`). That’s out of scope for this class MVP.
 # Line-Logic
+# Line-Logic
