@@ -1,5 +1,15 @@
 # Simple setup: GitHub + live website
 
+## If something broke (common fixes)
+
+- **`Repository not found`** — Create **`Line-Logic`** on GitHub first, then set `origin` to `https://github.com/<your-real-username>/Line-Logic.git` (replace `<your-real-username>` with the name on your GitHub profile, not `YOUR_USERNAME`).
+- **`pathspec '#'` / `skip` errors** — Don’t paste **comments** after commands. Run **one command at a time**. For commit, use only:  
+  `git commit -m "Line Logic MVP"`  
+  (no `# skip if...` on the same line.)
+- **Wrong folder** — Use `cd` into **`line-logic`** (with **`-logic`** at the end).
+
+---
+
 Follow these in order. **Skip a step** if you already did it.
 
 Use the repo name **`Line-Logic`** on GitHub so your links match that name. Your project folder on disk can stay `line-logic` — that’s fine.
