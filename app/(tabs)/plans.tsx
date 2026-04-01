@@ -159,7 +159,7 @@ export default function AccountScreen() {
         {PLAN_DEFS.map((plan) => {
           const current = tier === plan.id;
           const isPaid = plan.id !== 'base';
-          const showPurchase = isPaid && !owned;
+          const showPurchase = isPaid && !canAccessTier(plan.id);
           const label = showPurchase ? 'Purchase' : current ? '' : 'Select';
           const ctaKey = plan.id;
 

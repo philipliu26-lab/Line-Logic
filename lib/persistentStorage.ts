@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 /**
  * In-memory fallback when the native AsyncStorage module is unavailable
  * (e.g. some Expo Go + New Architecture combinations: "Native module is null").
+ * Single-device / single-user; web uses `persistentStorage.web.ts` (localStorage) instead.
  */
 const memory = new Map<string, string>();
 
