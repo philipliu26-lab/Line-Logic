@@ -1,0 +1,4 @@
+# Netlify: connect this repo or drag-drop the `dist` folder after `npm run build:web`.
+[build]
+  command = "npm run build:web"
+  publish = "dist"
