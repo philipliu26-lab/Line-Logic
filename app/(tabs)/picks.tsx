@@ -41,7 +41,8 @@ export default function PicksScreen() {
   const [detailPressedId, setDetailPressedId] = useState<string | null>(null);
 
   const cap = dailyPickCap;
-  const revealed = pickUsage?.revealedCount ?? 0;
+  const revealedRaw = pickUsage?.revealedCount ?? 0;
+  const revealed = Math.min(revealedRaw, cap);
   const canRevealMore = revealed < cap;
 
   const onReveal = useCallback(async () => {

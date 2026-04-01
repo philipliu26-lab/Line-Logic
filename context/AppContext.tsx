@@ -13,6 +13,7 @@ import {
   dailyLimitForTier,
   effectiveDailyPickCap,
   loadPickUsage,
+  savePickUsage,
   type PickUsageState,
   revealNextPick,
   type SubscriptionTier,
@@ -80,6 +81,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       cancelled = true;
     };
   }, []);
+
+  /** If tier drops (e.g. Elite → Base), stored reveals can exceed today’s cap — clamp and persist. */
+  useEffect(() => {
+    if (!ready || !pickUsage) return;
+    const cap = effectiveDailyPickCap(tier, catalogCount);
+    if (pickUsage.revealedCount <= cap) return;
+    const clamped: PickUsageState = { dateKey: pickUsage.dateKey, revealedCount: cap };
+    setPickUsage(clamped);
+    void savePickUsage(clamped);
+  }, [ready, tier, catalogCount, pickUsage]);
 
   const checkAccess = useCallback(
     (t: SubscriptionTier) => canAccessTier(t, purchasedTiers),
