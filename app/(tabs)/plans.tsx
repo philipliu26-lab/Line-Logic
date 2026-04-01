@@ -1,7 +1,14 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, View as RNView } from 'react-native';
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  View as RNView,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DisclaimerBanner } from '@/components/DisclaimerBanner';
@@ -11,14 +18,16 @@ import type { SubscriptionTier } from '@/lib/pickUsage';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 
-const PLANS: {
+type PlanDef = {
   id: SubscriptionTier;
   name: string;
   price: string;
   period: string;
   highlight: boolean;
   features: string[];
-}[] = [
+};
+
+const PLAN_DEFS: PlanDef[] = [
   {
     id: 'base',
     name: 'Base',
@@ -26,7 +35,7 @@ const PLANS: {
     period: '',
     highlight: false,
     features: [
-      'AI Picks: 3 per day',
+      'AI Picks: 3 per day (max catalog size in demo)',
       'Basic Odds Comparison',
       'Line Movement Tracking',
       'Standard Analytics Dashboard',
@@ -40,7 +49,7 @@ const PLANS: {
     period: '/ month',
     highlight: true,
     features: [
-      'AI Picks: 15 per day',
+      'AI Picks: up to 15 per day (capped by catalog in demo)',
       'Advanced Model Breakdowns',
       'Real-Time Line Alerts',
       'Historical Player & Performance data',
@@ -55,7 +64,7 @@ const PLANS: {
     period: '/ month',
     highlight: false,
     features: [
-      'Unlimited AI Picks',
+      'AI Picks: full catalog per day (plan cap vs catalog — demo uses catalog max)',
       'Premium Predictive Models',
       'Early Line Detection',
       'Custom Bet Sizing Recommendations',
@@ -68,8 +77,40 @@ const PLANS: {
 export default function AccountScreen() {
   const scheme = useColorScheme() ?? 'light';
   const c = Colors[scheme];
-  const { tier, setTier } = useApp();
+  const { tier, setTier, purchaseTier, canAccessTier, catalogCount } = useApp();
   const [emailAlerts, setEmailAlerts] = useState(true);
+  const [devPressed, setDevPressed] = useState(false);
+  const [ctaPressedKey, setCtaPressedKey] = useState<string | null>(null);
+
+  const openPurchase = (plan: PlanDef) => {
+    const priceLine = plan.period ? `${plan.price}${plan.period}` : plan.price;
+    Alert.alert(
+      'Mock purchase',
+      `Confirm purchase of ${plan.name} (${priceLine})? No real card is charged — this is a class demo.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Confirm purchase',
+          onPress: () => {
+            void purchaseTier(plan.id);
+          },
+        },
+      ]
+    );
+  };
+
+  const onPlanAction = (plan: PlanDef) => {
+    if (tier === plan.id) return;
+    if (plan.id === 'base') {
+      void setTier('base');
+      return;
+    }
+    if (!canAccessTier(plan.id)) {
+      openPurchase(plan);
+      return;
+    }
+    void setTier(plan.id);
+  };
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: c.background }]} edges={['bottom']}>
@@ -78,7 +119,9 @@ export default function AccountScreen() {
 
         <Text style={[styles.pageTitle, { color: c.text }]}>Account</Text>
         <Text style={[styles.pageSub, { color: c.textSecondary }]}>
-          Subscription tiers for Line Logic (mock checkout — tap Select to switch your demo plan).
+          Pro and Elite require a mock purchase. You can switch between tiers you already own (Elite can
+          switch to Pro) without buying again. This demo has {catalogCount} mocked picks; your daily cap
+          is the lower of your plan and that number.
         </Text>
 
         <RNView style={[styles.rowCard, { backgroundColor: c.surface, borderColor: c.border }]}>
@@ -100,10 +143,9 @@ export default function AccountScreen() {
         {tier === 'elite' ? (
           <Pressable
             onPress={() => router.push('/developer')}
-            style={({ pressed }) => [
-              styles.devBtn,
-              { backgroundColor: c.accent, opacity: pressed ? 0.9 : 1 },
-            ]}
+            onPressIn={() => setDevPressed(true)}
+            onPressOut={() => setDevPressed(false)}
+            style={[styles.devBtn, { backgroundColor: c.accent, opacity: devPressed ? 0.9 : 1 }]}
             accessibilityRole="button"
             accessibilityLabel="Open developer API page">
             <FontAwesome name="code" size={18} color="#fff" />
@@ -114,8 +156,13 @@ export default function AccountScreen() {
 
         <Text style={[styles.title, { color: c.text, marginTop: 8 }]}>Plans</Text>
 
-        {PLANS.map((plan) => {
+        {PLAN_DEFS.map((plan) => {
           const current = tier === plan.id;
+          const isPaid = plan.id !== 'base';
+          const showPurchase = isPaid && !owned;
+          const label = showPurchase ? 'Purchase' : current ? '' : 'Select';
+          const ctaKey = plan.id;
+
           return (
             <RNView
               key={plan.id}
@@ -155,14 +202,28 @@ export default function AccountScreen() {
                   </RNView>
                 ) : (
                   <Pressable
-                    onPress={() => setTier(plan.id)}
-                    style={({ pressed }) => [
-                      styles.cta,
-                      { borderColor: c.accent, opacity: pressed ? 0.85 : 1 },
+                    onPress={() => onPlanAction(plan)}
+                    onPressIn={() => setCtaPressedKey(ctaKey)}
+                    onPressOut={() => setCtaPressedKey(null)}
+                    style={[
+                      showPurchase ? styles.ctaPurchase : styles.cta,
+                      {
+                        borderColor: c.accent,
+                        backgroundColor: showPurchase ? c.accent : 'transparent',
+                        opacity: ctaPressedKey === ctaKey ? 0.85 : 1,
+                      },
                     ]}
                     accessibilityRole="button"
-                    accessibilityLabel={`Select ${plan.name} plan`}>
-                    <Text style={[styles.ctaText, { color: c.accent }]}>Select</Text>
+                    accessibilityLabel={
+                      showPurchase ? `Purchase ${plan.name} plan` : `Select ${plan.name} plan`
+                    }>
+                    <Text
+                      style={[
+                        showPurchase ? styles.ctaPurchaseText : styles.ctaText,
+                        { color: showPurchase ? '#fff' : c.accent },
+                      ]}>
+                      {label}
+                    </Text>
                   </Pressable>
                 )}
               </RNView>
@@ -235,7 +296,9 @@ const styles = StyleSheet.create({
   currentBadge: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10 },
   currentText: { fontSize: 12, fontWeight: '800' },
   cta: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10, borderWidth: 1 },
+  ctaPurchase: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10, borderWidth: 1 },
   ctaText: { fontSize: 13, fontWeight: '800' },
+  ctaPurchaseText: { fontSize: 13, fontWeight: '800' },
   featRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
   featIcon: { marginRight: 10, marginTop: 2 },
   featText: { flex: 1, fontSize: 14, lineHeight: 20 },

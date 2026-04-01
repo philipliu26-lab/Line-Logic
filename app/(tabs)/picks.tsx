@@ -1,6 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -26,13 +26,21 @@ function tierLabel(t: string) {
 export default function PicksScreen() {
   const scheme = useColorScheme() ?? 'light';
   const c = Colors[scheme];
-  const { tier, pickUsage, refreshPickUsage, revealNextPick, dailyLimit, catalogCount, ready } =
-    useApp();
+  const {
+    tier,
+    pickUsage,
+    refreshPickUsage,
+    revealNextPick,
+    dailyPickCap,
+    planDailyLimit,
+    catalogCount,
+    ready,
+  } = useApp();
   const [busy, setBusy] = useState(false);
   const [revealPressed, setRevealPressed] = useState(false);
   const [detailPressedId, setDetailPressedId] = useState<string | null>(null);
 
-  const cap = useMemo(() => Math.min(dailyLimit, catalogCount), [dailyLimit, catalogCount]);
+  const cap = dailyPickCap;
   const revealed = pickUsage?.revealedCount ?? 0;
   const canRevealMore = revealed < cap;
 
@@ -79,7 +87,9 @@ export default function PicksScreen() {
             <FontAwesome name="lock" size={14} color={c.muted} accessibilityLabel="" />
           </RNView>
           <Text style={[styles.tierHint, { color: c.textSecondary }]}>
-            Resets at local midnight. Elite shows the full catalog without a low cap.
+            Resets at local midnight. Daily cap is the lower of your plan (
+            {planDailyLimit >= 9999 ? 'unlimited' : planDailyLimit} per day) and today&apos;s catalog (
+            {catalogCount} picks).
           </Text>
         </RNView>
 

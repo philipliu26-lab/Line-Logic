@@ -8,8 +8,10 @@ import React, {
 } from 'react';
 
 import { MOCK_PICKS } from '@/data/picks';
+import { canAccessTier, loadEntitlements, saveEntitlements } from '@/lib/entitlements';
 import {
   dailyLimitForTier,
+  effectiveDailyPickCap,
   loadPickUsage,
   type PickUsageState,
   revealNextPick,
@@ -20,13 +22,21 @@ import { STORAGE_TIER } from '@/lib/storageKeys';
 
 type AppContextValue = {
   tier: SubscriptionTier;
+  /** Switch to an already-owned tier (Base, or a tier you purchased). */
   setTier: (t: SubscriptionTier) => Promise<void>;
+  /** Mock checkout: unlocks tier and sets it active. */
+  purchaseTier: (t: SubscriptionTier) => Promise<void>;
+  canAccessTier: (t: SubscriptionTier) => boolean;
+  purchasedTiers: SubscriptionTier[];
   onboardingComplete: boolean;
   completeOnboarding: () => Promise<void>;
   pickUsage: PickUsageState | null;
   refreshPickUsage: () => Promise<void>;
   revealNextPick: () => Promise<{ ok: true } | { ok: false; reason: 'at_limit' }>;
-  dailyLimit: number;
+  /** Raw plan limit (3 / 15 / unlimited). */
+  planDailyLimit: number;
+  /** Enforced cap today: min(plan, catalog size). */
+  dailyPickCap: number;
   catalogCount: number;
   ready: boolean;
 };
@@ -35,20 +45,32 @@ const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [tier, setTierState] = useState<SubscriptionTier>('base');
+  const [purchasedTiers, setPurchasedTiersState] = useState<SubscriptionTier[]>(['base']);
   const [onboardingComplete, setOnboardingComplete] = useState(false);
   const [pickUsage, setPickUsage] = useState<PickUsageState | null>(null);
   const [ready, setReady] = useState(false);
+
+  const catalogCount = MOCK_PICKS.length;
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const [t, usage] = await Promise.all([
+        const [t, usage, ent] = await Promise.all([
           persistentStorage.getItem(STORAGE_TIER),
           loadPickUsage(),
+          loadEntitlements(),
         ]);
         if (cancelled) return;
-        if (t === 'pro' || t === 'elite' || t === 'base') setTierState(t);
+        setPurchasedTiersState(ent);
+        if (t === 'pro' || t === 'elite' || t === 'base') {
+          if (canAccessTier(t, ent)) {
+            setTierState(t);
+          } else {
+            setTierState('base');
+            await persistentStorage.setItem(STORAGE_TIER, 'base');
+          }
+        }
         setPickUsage(usage);
       } finally {
         if (!cancelled) setReady(true);
@@ -59,10 +81,36 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const setTier = useCallback(async (t: SubscriptionTier) => {
-    setTierState(t);
-    await persistentStorage.setItem(STORAGE_TIER, t);
-  }, []);
+  const checkAccess = useCallback(
+    (t: SubscriptionTier) => canAccessTier(t, purchasedTiers),
+    [purchasedTiers]
+  );
+
+  const setTier = useCallback(
+    async (t: SubscriptionTier) => {
+      if (!canAccessTier(t, purchasedTiers)) return;
+      setTierState(t);
+      await persistentStorage.setItem(STORAGE_TIER, t);
+    },
+    [purchasedTiers]
+  );
+
+  const purchaseTier = useCallback(
+    async (t: SubscriptionTier) => {
+      if (t === 'base') {
+        await setTier('base');
+        return;
+      }
+      const next = new Set(purchasedTiers);
+      next.add(t);
+      const list = Array.from(next);
+      await saveEntitlements(list);
+      setPurchasedTiersState(list);
+      setTierState(t);
+      await persistentStorage.setItem(STORAGE_TIER, t);
+    },
+    [purchasedTiers]
+  );
 
   // Intentionally not persisted: each full app load shows the 3 intro slides again.
   const completeOnboarding = useCallback(async () => {
@@ -80,30 +128,40 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return result;
   }, [tier]);
 
-  const dailyLimit = dailyLimitForTier(tier);
+  const planDailyLimit = dailyLimitForTier(tier);
+  const dailyPickCap = effectiveDailyPickCap(tier, catalogCount);
 
   const value = useMemo(
     () => ({
       tier,
       setTier,
+      purchaseTier,
+      canAccessTier: checkAccess,
+      purchasedTiers,
       onboardingComplete,
       completeOnboarding,
       pickUsage,
       refreshPickUsage,
       revealNextPick: doRevealNextPick,
-      dailyLimit,
-      catalogCount: MOCK_PICKS.length,
+      planDailyLimit,
+      dailyPickCap,
+      catalogCount,
       ready,
     }),
     [
       tier,
       setTier,
+      purchaseTier,
+      checkAccess,
+      purchasedTiers,
       onboardingComplete,
       completeOnboarding,
       pickUsage,
       refreshPickUsage,
       doRevealNextPick,
-      dailyLimit,
+      planDailyLimit,
+      dailyPickCap,
+      catalogCount,
       ready,
     ]
   );

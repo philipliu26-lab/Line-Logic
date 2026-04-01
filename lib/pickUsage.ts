@@ -22,6 +22,11 @@ export function dailyLimitForTier(tier: SubscriptionTier): number {
   return 9999;
 }
 
+/** Enforced cap: lower of plan daily limit and picks available in the catalog. */
+export function effectiveDailyPickCap(tier: SubscriptionTier, catalogCount: number): number {
+  return Math.min(dailyLimitForTier(tier), catalogCount);
+}
+
 export async function loadPickUsage(): Promise<PickUsageState> {
   const today = localDateKey();
   try {
