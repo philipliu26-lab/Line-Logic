@@ -50,8 +50,7 @@ export default function AlertsScreen() {
           <RNView
             key={a.id}
             style={[styles.card, { backgroundColor: c.surface, borderColor: c.border, opacity: showRealtime ? 1 : 0.45 }]}
-            accessibilityElementsHidden={!showRealtime}
-            importantForAccessibility={showRealtime ? 'yes' : 'no-hide-descendants'}>
+            accessibilityElementsHidden={!showRealtime}>
             <RNView style={styles.cardTop}>
               <RNView style={[styles.sportTag, { backgroundColor: c.background }]}>
                 <Text style={[styles.sportText, { color: c.accent }]}>{a.sport}</Text>

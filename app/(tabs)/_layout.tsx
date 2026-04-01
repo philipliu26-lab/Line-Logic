@@ -1,3 +1,5 @@
+import type { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
+import { PlatformPressable } from '@react-navigation/elements';
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router, Tabs } from 'expo-router';
@@ -13,6 +15,12 @@ function TabBarIcon(props: {
   color: string;
 }) {
   return <FontAwesome size={22} style={{ marginBottom: -2 }} {...props} />;
+}
+
+/** Web: strip `href` from tab buttons so RN Web does not render `<a>` + link styles (fixes CSSStyleDeclaration errors). */
+function WebTabBarButton(props: BottomTabBarButtonProps) {
+  const { href: _href, ...rest } = props;
+  return <PlatformPressable {...rest} />;
 }
 
 export default function TabLayout() {
@@ -50,6 +58,7 @@ export default function TabLayout() {
           fontSize: 10,
           fontWeight: '600',
         },
+        ...(Platform.OS === 'web' ? { tabBarButton: WebTabBarButton } : {}),
       }}>
       <Tabs.Screen
         name="index"

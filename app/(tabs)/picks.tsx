@@ -29,6 +29,8 @@ export default function PicksScreen() {
   const { tier, pickUsage, refreshPickUsage, revealNextPick, dailyLimit, catalogCount, ready } =
     useApp();
   const [busy, setBusy] = useState(false);
+  const [revealPressed, setRevealPressed] = useState(false);
+  const [detailPressedId, setDetailPressedId] = useState<string | null>(null);
 
   const cap = useMemo(() => Math.min(dailyLimit, catalogCount), [dailyLimit, catalogCount]);
   const revealed = pickUsage?.revealedCount ?? 0;
@@ -85,9 +87,11 @@ export default function PicksScreen() {
           <Pressable
             onPress={onReveal}
             disabled={busy}
-            style={({ pressed }) => [
+            onPressIn={() => setRevealPressed(true)}
+            onPressOut={() => setRevealPressed(false)}
+            style={[
               styles.revealBtn,
-              { backgroundColor: c.accent, opacity: busy || pressed ? 0.85 : 1 },
+              { backgroundColor: c.accent, opacity: busy || revealPressed ? 0.85 : 1 },
             ]}
             accessibilityRole="button"
             accessibilityLabel="Reveal next AI pick"
@@ -140,7 +144,12 @@ export default function PicksScreen() {
                   )}
                   <Pressable
                     onPress={() => router.push(`/pick/${p.id}`)}
-                    style={({ pressed }) => [styles.detailBtn, { opacity: pressed ? 0.8 : 1 }]}
+                    onPressIn={() => setDetailPressedId(p.id)}
+                    onPressOut={() => setDetailPressedId(null)}
+                    style={[
+                      styles.detailBtn,
+                      { opacity: detailPressedId === p.id ? 0.8 : 1 },
+                    ]}
                     accessibilityRole="button"
                     accessibilityLabel={`Open details for ${p.event}`}>
                     <Text style={[styles.detailBtnText, { color: c.accent }]}>View proof & detail</Text>
