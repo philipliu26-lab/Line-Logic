@@ -10,6 +10,7 @@ import React, {
 import { MOCK_PICKS } from '@/data/picks';
 import { canAccessTier, loadEntitlements, saveEntitlements } from '@/lib/entitlements';
 import {
+  clampPickUsageToCap,
   dailyLimitForTier,
   effectiveDailyPickCap,
   loadPickUsage,
@@ -57,21 +58,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const [t, usage, ent] = await Promise.all([
+        const [t, usageRaw, ent] = await Promise.all([
           persistentStorage.getItem(STORAGE_TIER),
           loadPickUsage(),
           loadEntitlements(),
         ]);
         if (cancelled) return;
         setPurchasedTiersState(ent);
+
+        let resolvedTier: SubscriptionTier = 'base';
         if (t === 'pro' || t === 'elite' || t === 'base') {
           if (canAccessTier(t, ent)) {
-            setTierState(t);
+            resolvedTier = t;
           } else {
-            setTierState('base');
             await persistentStorage.setItem(STORAGE_TIER, 'base');
           }
         }
+
+        const usage = clampPickUsageToCap(usageRaw, resolvedTier, catalogCount);
+        if (
+          usage.revealedCount !== usageRaw.revealedCount ||
+          usage.dateKey !== usageRaw.dateKey
+        ) {
+          await savePickUsage(usage);
+        }
+
+        if (cancelled) return;
+        setTierState(resolvedTier);
         setPickUsage(usage);
       } finally {
         if (!cancelled) setReady(true);

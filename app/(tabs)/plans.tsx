@@ -1,14 +1,7 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { router } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { useState } from 'react';
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  View as RNView,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Switch, View as RNView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DisclaimerBanner } from '@/components/DisclaimerBanner';
@@ -77,27 +70,10 @@ const PLAN_DEFS: PlanDef[] = [
 export default function AccountScreen() {
   const scheme = useColorScheme() ?? 'light';
   const c = Colors[scheme];
-  const { tier, setTier, purchaseTier, canAccessTier, catalogCount } = useApp();
+  const { tier, setTier, canAccessTier, catalogCount } = useApp();
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [devPressed, setDevPressed] = useState(false);
   const [ctaPressedKey, setCtaPressedKey] = useState<string | null>(null);
-
-  const openPurchase = (plan: PlanDef) => {
-    const priceLine = plan.period ? `${plan.price}${plan.period}` : plan.price;
-    Alert.alert(
-      'Mock purchase',
-      `Confirm purchase of ${plan.name} (${priceLine})? No real card is charged — this is a class demo.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Confirm purchase',
-          onPress: () => {
-            void purchaseTier(plan.id);
-          },
-        },
-      ]
-    );
-  };
 
   const onPlanAction = (plan: PlanDef) => {
     if (tier === plan.id) return;
@@ -106,7 +82,7 @@ export default function AccountScreen() {
       return;
     }
     if (!canAccessTier(plan.id)) {
-      openPurchase(plan);
+      router.push(`/purchase/${plan.id}` as Href);
       return;
     }
     void setTier(plan.id);

@@ -93,6 +93,14 @@ function RootLayoutNav() {
         />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'About' }} />
         <Stack.Screen
+          name="purchase/[tier]"
+          options={{
+            title: 'Checkout',
+            headerBackTitle: 'Back',
+            headerLeft: (props) => <StackHeaderLeading navigationProps={props} />,
+          }}
+        />
+        <Stack.Screen
           name="developer"
           options={{
             title: 'Developer API',

@@ -49,6 +49,21 @@ export async function savePickUsage(state: PickUsageState): Promise<void> {
   await persistentStorage.setItem(STORAGE_PICK_USAGE, JSON.stringify(state));
 }
 
+/** Ensures stored reveals never exceed today’s cap for this tier (e.g. after downgrade). */
+export function clampPickUsageToCap(
+  usage: PickUsageState,
+  tier: SubscriptionTier,
+  catalogCount: number
+): PickUsageState {
+  const today = localDateKey();
+  if (usage.dateKey !== today) {
+    return { dateKey: today, revealedCount: 0 };
+  }
+  const cap = effectiveDailyPickCap(tier, catalogCount);
+  const r = Math.max(0, Math.min(usage.revealedCount, cap));
+  return { dateKey: usage.dateKey, revealedCount: r };
+}
+
 /** Resets at local calendar midnight by comparing date keys (device local time). */
 export async function revealNextPick(
   tier: SubscriptionTier,

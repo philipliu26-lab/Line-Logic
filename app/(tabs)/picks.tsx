@@ -41,9 +41,9 @@ export default function PicksScreen() {
   const [detailPressedId, setDetailPressedId] = useState<string | null>(null);
 
   const cap = dailyPickCap;
-  const revealedRaw = pickUsage?.revealedCount ?? 0;
-  const revealed = Math.min(revealedRaw, cap);
-  const canRevealMore = revealed < cap;
+  /** Slots unlocked from the top of the list; never above today’s cap (storage is clamped on load). */
+  const slotsRevealed = Math.min(pickUsage?.revealedCount ?? 0, cap);
+  const canRevealMore = slotsRevealed < cap;
 
   const onReveal = useCallback(async () => {
     setBusy(true);
@@ -81,7 +81,7 @@ export default function PicksScreen() {
           </RNView>
           <RNView style={styles.counterRow}>
             <Text style={[styles.counterMain, { color: c.text }]} accessibilityLiveRegion="polite">
-              <Text style={{ color: c.accent, fontWeight: '800' }}>{revealed}</Text>
+              <Text style={{ color: c.accent, fontWeight: '800' }}>{slotsRevealed}</Text>
               <Text style={{ color: c.muted }}> / {cap} </Text>
               AI picks revealed today
             </Text>
@@ -132,7 +132,7 @@ export default function PicksScreen() {
         <Text style={[styles.sectionLabel, { color: c.muted }]}>Today&apos;s picks</Text>
 
         {MOCK_PICKS.map((p, index) => {
-          const unlocked = index < revealed;
+          const unlocked = index < slotsRevealed;
           return (
             <RNView
               key={p.id}
