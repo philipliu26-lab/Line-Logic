@@ -1,5 +1,5 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link } from 'expo-router';
+import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, View as RNView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -86,14 +86,13 @@ export default function AnalyticsScreen() {
               Feature importance, simulation bands, historical player performance overlays—part of Pro
               and Elite.
             </Text>
-            <Link href="/(tabs)/plans" asChild>
-              <Pressable
-                style={[styles.fakeBtn, { borderColor: c.accent }]}
-                accessibilityRole="button"
-                accessibilityLabel="View plans to upgrade">
-                <Text style={[styles.fakeBtnText, { color: c.accent }]}>View plans</Text>
-              </Pressable>
-            </Link>
+            <Pressable
+              onPress={() => router.push('/(tabs)/plans')}
+              style={[styles.fakeBtn, { borderColor: c.accent }]}
+              accessibilityRole="button"
+              accessibilityLabel="View plans to upgrade">
+              <Text style={[styles.fakeBtnText, { color: c.accent }]}>View plans</Text>
+            </Pressable>
           </RNView>
         )}
 

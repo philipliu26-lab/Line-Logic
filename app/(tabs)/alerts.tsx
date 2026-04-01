@@ -1,5 +1,5 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link } from 'expo-router';
+import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, View as RNView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -29,14 +29,13 @@ export default function AlertsScreen() {
               Base includes email alerts as a placeholder in Account. Pro and Elite unlock this in-app
               alert feed with mock steam events for your demo.
             </Text>
-            <Link href="/(tabs)/plans" asChild>
-              <Pressable
-                style={[styles.cta, { borderColor: c.accent }]}
-                accessibilityRole="button"
-                accessibilityLabel="Upgrade plan for alerts">
-                <Text style={[styles.ctaText, { color: c.accent }]}>View plans</Text>
-              </Pressable>
-            </Link>
+            <Pressable
+              onPress={() => router.push('/(tabs)/plans')}
+              style={[styles.cta, { borderColor: c.accent }]}
+              accessibilityRole="button"
+              accessibilityLabel="Upgrade plan for alerts">
+              <Text style={[styles.ctaText, { color: c.accent }]}>View plans</Text>
+            </Pressable>
           </RNView>
         ) : (
           <RNView style={[styles.liveBanner, { backgroundColor: c.accent + '18', borderColor: c.accent + '44' }]}>

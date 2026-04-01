@@ -1,6 +1,6 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 import { Pressable, Platform } from 'react-native';
 
 import { HeaderBrand } from '@/components/HeaderBrand';
@@ -57,19 +57,20 @@ export default function TabLayout() {
           title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable style={{ marginRight: 16 }}>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={22}
-                    color={c.text}
-                    style={{ opacity: pressed ? 0.5 : 1 }}
-                    accessibilityLabel="About Line Logic"
-                  />
-                )}
-              </Pressable>
-            </Link>
+            <Pressable
+              onPress={() => router.push('/modal')}
+              style={{ marginRight: 16 }}
+              accessibilityRole="button"
+              accessibilityLabel="About Line Logic">
+              {({ pressed }) => (
+                <FontAwesome
+                  name="info-circle"
+                  size={22}
+                  color={c.text}
+                  style={{ opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
           ),
         }}
       />

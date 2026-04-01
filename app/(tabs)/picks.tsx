@@ -1,5 +1,5 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -104,14 +104,13 @@ export default function PicksScreen() {
               You&apos;ve reached today&apos;s limit for your plan. Upgrade under Account for more picks, or
               check back after midnight (local time).
             </Text>
-            <Link href="/(tabs)/plans" asChild>
-              <Pressable
-                style={[styles.linkBtn, { borderColor: c.accent }]}
-                accessibilityRole="button"
-                accessibilityLabel="Open account and plans">
-                <Text style={[styles.linkBtnText, { color: c.accent }]}>View Account</Text>
-              </Pressable>
-            </Link>
+            <Pressable
+              onPress={() => router.push('/(tabs)/plans')}
+              style={[styles.linkBtn, { borderColor: c.accent }]}
+              accessibilityRole="button"
+              accessibilityLabel="Open account and plans">
+              <Text style={[styles.linkBtnText, { color: c.accent }]}>View Account</Text>
+            </Pressable>
           </RNView>
         )}
 
