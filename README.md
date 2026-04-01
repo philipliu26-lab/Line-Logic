@@ -116,7 +116,7 @@ This repo includes **GitHub Actions** (`.github/workflows/deploy-web.yml`) that 
    git add .
    git commit -m "Line Logic MVP"
    git branch -M main
-   git remote add origin https://github.com/YOUR_USER/Line-Logic.git
+   git remote add origin https://github.com/philipliu26-lab/Line-Logic.git
    git push -u origin main
    ```
 
@@ -126,7 +126,7 @@ This repo includes **GitHub Actions** (`.github/workflows/deploy-web.yml`) that 
 
 4. Your public URL will look like:
 
-   `https://YOUR_USER.github.io/Line-Logic/`
+   `https://philipliu26-lab.github.io/Line-Logic/`
 
    (The workflow sets `EXPO_ROUTER_BASE_PATH` to match the repo name so assets load correctly.)
 

@@ -22,17 +22,17 @@ Use the repo name **`Line-Logic`** on GitHub so your links match that name. Your
 Name it **`Line-Logic`** (capital L, hyphen). **Do not** add README or .gitignore (you already have them). Create the repo.
 
 **2.** Copy the repo URL GitHub shows (HTTPS), e.g.  
-`https://github.com/yourname/Line-Logic.git`
+`https://github.com/philipliu26-lab/Line-Logic.git`
 
 **3.** On your Mac, in Terminal:
 
 ```bash
 cd /Users/philipliu26/line-logic
-git remote set-url origin https://github.com/yourname/Line-Logic.git
+git remote set-url origin https://github.com/philipliu26-lab/Line-Logic.git
 git push -u origin main
 ```
 
-(Replace `yourname` with your GitHub username. Keep **`Line-Logic`** as the repo name if you want that URL.)
+(Your GitHub username is **`philipliu26-lab`**. Keep repo name **`Line-Logic`**.)
 
 **4.** Refresh GitHub — your files should appear.
 
@@ -59,8 +59,8 @@ npm run site-links
 
 You’ll see:
 
-- **Repository** — e.g. `https://github.com/yourname/Line-Logic`  
-- **GitHub Pages** — e.g. `https://yourname.github.io/Line-Logic/` (open in a browser or use for a QR code)
+- **Repository** — `https://github.com/philipliu26-lab/Line-Logic`  
+- **GitHub Pages** — `https://philipliu26-lab.github.io/Line-Logic/` (open in a browser or use for a QR code)
 
 If `site-links` says you still have a placeholder remote, redo **step 3** with the correct URL.
 
