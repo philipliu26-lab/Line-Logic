@@ -2,6 +2,8 @@
 
 Class MVP: a demo-only **Expo (React Native) + TypeScript** app that presents **Line Logic** as a data-backed sports betting insights product. All odds, picks, and alerts are **mocked**.
 
+**→ Simple checklist to put the app on GitHub and get a public website link:** see **[SITE_LINKS.md](./SITE_LINKS.md)** (8 short steps).
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) LTS (v18+ recommended; project tested with modern LTS)
@@ -162,3 +164,4 @@ This is an **educational prototype**. It is **not** gambling or financial advice
 ## Production builds (outline only)
 
 For store-ready binaries you’d use [EAS Build](https://docs.expo.dev/build/introduction/) (`eas build`). That’s out of scope for this class MVP.
+# Line-Logic
