@@ -14,8 +14,8 @@ export function DisclaimerBanner() {
       accessibilityRole="text"
       accessibilityLabel="Disclaimer: educational prototype, not gambling advice.">
       <Text style={[styles.text, { color: c.textSecondary }]}>
-        Educational prototype — not gambling or financial advice. All data is mocked for class
-        demonstration.
+        Educational prototype — not gambling or financial advice. Featured matchups, lines, and times are
+        illustrative for class demonstration.
       </Text>
     </RNView>
   );

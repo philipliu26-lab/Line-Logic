@@ -61,6 +61,9 @@ export default function PickDetailScreen() {
             ) : null}
           </RNView>
           <Text style={[styles.event, { color: c.text }]}>{pick.event}</Text>
+          {pick.scheduledFor ? (
+            <Text style={[styles.scheduledFor, { color: c.muted }]}>{pick.scheduledFor}</Text>
+          ) : null}
           <Text style={[styles.pickLine, { color: c.text }]}>{pick.pick}</Text>
           <Text style={[styles.note, { color: c.textSecondary }]}>{pick.note}</Text>
         </RNView>
@@ -218,7 +221,8 @@ const styles = StyleSheet.create({
   tagText: { fontSize: 11, fontWeight: '800' },
   elitePill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
   elitePillText: { fontSize: 11, fontWeight: '800' },
-  event: { fontSize: 15, fontWeight: '700', marginBottom: 6 },
+  event: { fontSize: 15, fontWeight: '700', marginBottom: 4 },
+  scheduledFor: { fontSize: 13, fontWeight: '600', marginBottom: 8 },
   pickLine: { fontSize: 22, fontWeight: '800', marginBottom: 8 },
   note: { fontSize: 14, lineHeight: 20 },
   card: { borderRadius: 14, borderWidth: 1, padding: 14, marginBottom: 16 },

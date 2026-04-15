@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/DisclaimerBanner';
 import { Text } from '@/components/Themed';
 import { useApp } from '@/context/AppContext';
+import { PRESENTATION_SHOWCASE_MODE } from '@/constants/presentation';
 import { MOCK_PICKS } from '@/data/picks';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -42,8 +43,11 @@ export default function PicksScreen() {
 
   const cap = dailyPickCap;
   /** Slots unlocked from the top of the list; never above today’s cap (storage is clamped on load). */
-  const slotsRevealed = Math.min(pickUsage?.revealedCount ?? 0, cap);
-  const canRevealMore = slotsRevealed < cap;
+  const slotsFromUsage = Math.min(pickUsage?.revealedCount ?? 0, cap);
+  const effectiveSlotsRevealed = PRESENTATION_SHOWCASE_MODE
+    ? Math.min(MOCK_PICKS.length, cap)
+    : slotsFromUsage;
+  const canRevealMore = !PRESENTATION_SHOWCASE_MODE && slotsFromUsage < cap;
 
   const onReveal = useCallback(async () => {
     setBusy(true);
@@ -81,7 +85,7 @@ export default function PicksScreen() {
           </RNView>
           <RNView style={styles.counterRow}>
             <Text style={[styles.counterMain, { color: c.text }]} accessibilityLiveRegion="polite">
-              <Text style={{ color: c.accent, fontWeight: '800' }}>{slotsRevealed}</Text>
+              <Text style={{ color: c.accent, fontWeight: '800' }}>{effectiveSlotsRevealed}</Text>
               <Text style={{ color: c.muted }}> / {cap} </Text>
               AI picks revealed today
             </Text>
@@ -89,12 +93,21 @@ export default function PicksScreen() {
           </RNView>
           <Text style={[styles.tierHint, { color: c.textSecondary }]}>
             Resets at local midnight. Daily cap is the lower of your plan (
-            {planDailyLimit >= 9999 ? 'unlimited' : planDailyLimit} per day) and today&apos;s catalog (
-            {catalogCount} picks).
+            {planDailyLimit >= 9999 ? 'unlimited' : planDailyLimit} per day) and this catalog (
+            {catalogCount} featured games).
+            {PRESENTATION_SHOWCASE_MODE
+              ? ' Demo mode: all featured picks are visible for your presentation.'
+              : ''}
           </Text>
         </RNView>
 
-        {canRevealMore ? (
+        {PRESENTATION_SHOWCASE_MODE ? (
+          <RNView style={[styles.demoBanner, { borderColor: c.accent, backgroundColor: c.accent + '14' }]}>
+            <Text style={[styles.demoBannerText, { color: c.text }]}>
+              Demo: all featured games and predictions are visible — no need to tap Reveal.
+            </Text>
+          </RNView>
+        ) : canRevealMore ? (
           <Pressable
             onPress={onReveal}
             disabled={busy}
@@ -129,10 +142,10 @@ export default function PicksScreen() {
           </RNView>
         )}
 
-        <Text style={[styles.sectionLabel, { color: c.muted }]}>Today&apos;s picks</Text>
+        <Text style={[styles.sectionLabel, { color: c.muted }]}>Featured upcoming games</Text>
 
         {MOCK_PICKS.map((p, index) => {
-          const unlocked = index < slotsRevealed;
+          const unlocked = index < effectiveSlotsRevealed;
           return (
             <RNView
               key={p.id}
@@ -143,6 +156,9 @@ export default function PicksScreen() {
                 </RNView>
                 <Text style={[styles.event, { color: c.text }]}>{p.event}</Text>
               </RNView>
+              {p.scheduledFor ? (
+                <Text style={[styles.scheduledFor, { color: c.muted }]}>{p.scheduledFor}</Text>
+              ) : null}
               {unlocked ? (
                 <>
                   <Text style={[styles.pickLine, { color: c.text }]}>{p.pick}</Text>
@@ -245,7 +261,15 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 12,
   },
-  pickTop: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
+  pickTop: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 6 },
+  scheduledFor: { fontSize: 12, fontWeight: '600', marginBottom: 8 },
+  demoBanner: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+  },
+  demoBannerText: { fontSize: 13, lineHeight: 18, fontWeight: '600', textAlign: 'center' },
   sportTag: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   sportText: { fontSize: 11, fontWeight: '800' },
   event: { fontSize: 14, fontWeight: '600', flex: 1 },
