@@ -6,33 +6,36 @@ export type LineAlert = {
   sport: string;
 };
 
-export const MOCK_ALERTS: LineAlert[] = [
+import { MOCK_PICKS } from '@/data/picks';
+
+const TIME_LABELS = ['2m ago', '14m ago', '1h ago', '3h ago', 'Yesterday'];
+
+/** Demo alerts based on the current featured games in `data/picks.ts`. */
+export const LINE_ALERTS: LineAlert[] = [
+  ...MOCK_PICKS.map((p, idx): LineAlert => {
+    const timeLabel = TIME_LABELS[idx] ?? `${idx + 1}h ago`;
+    const move = p.lineOpen && p.lineNow ? `${p.lineOpen} → ${p.lineNow}` : p.lineMoveLabel;
+    return {
+      id: `pick-${p.id}`,
+      sport: p.sport,
+      title: `Line move: ${p.event}`,
+      body: `${move}. Pick: ${p.pick}.`,
+      timeLabel,
+    };
+  }),
+  // A couple of generic “system” events still tied to the slate.
   {
-    id: 'a1',
-    title: 'Steam: Chiefs @ Bills total',
-    body: 'Total ticked 48.0 → 47.5 on three books in 6 minutes (mock).',
-    timeLabel: '2m ago',
-    sport: 'NFL',
+    id: 'meta-early',
+    sport: 'Market',
+    title: 'Early lines posted',
+    body: 'Lookahead lines refreshed for today’s featured slate.',
+    timeLabel: TIME_LABELS[MOCK_PICKS.length] ?? '4h ago',
   },
   {
-    id: 'a2',
-    title: 'Spread move: Lakers @ Celtics',
-    body: 'Celtics -4.5 now widely available vs -4.0 opener (illustrative).',
-    timeLabel: '14m ago',
-    sport: 'NBA',
-  },
-  {
-    id: 'a3',
-    title: 'Early line posted',
-    body: 'Elite: lookahead total posted 12h earlier than usual window (demo flag).',
-    timeLabel: '1h ago',
-    sport: 'NBA',
-  },
-  {
-    id: 'a4',
-    title: 'Injury watch',
-    body: 'Secondary ball-handler questionable — model confidence downgraded on pace props (mock).',
-    timeLabel: '3h ago',
-    sport: 'NBA',
+    id: 'meta-roster',
+    sport: 'Model',
+    title: 'Roster context updated',
+    body: 'Lineups are synced to each team’s most recent game; stats shown are season-to-date.',
+    timeLabel: TIME_LABELS[MOCK_PICKS.length + 1] ?? '6h ago',
   },
 ];

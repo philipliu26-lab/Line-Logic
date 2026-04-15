@@ -32,7 +32,7 @@ export default function HomeScreen() {
           </RNView>
           <Text style={[styles.mockLabel, { color: c.muted }]}>Sample data — MVP preview</Text>
           <RNView style={styles.statRow}>
-            <StatBlock label="Active lines tracked" value="128" sub="NBA · NFL · MLB" c={c} />
+            <StatBlock label="Active lines tracked" value="128" sub="NBA · NHL · MLB" c={c} />
             <StatBlock label="Avg. line move (24h)" value="1.2" sub="pts / spread" c={c} />
           </RNView>
         </RNView>

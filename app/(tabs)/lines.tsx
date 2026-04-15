@@ -6,10 +6,23 @@ import { Text } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 
+/** In-season spring slate: NBA + NHL + MLB (NFL off until fall). Illustrative prices only. */
 const GAME_LINES = [
-  { book: 'Book A', spread: '-3.0', total: 'o/u 48.5', ml: '-142' },
-  { book: 'Book B', spread: '-2.5', total: 'o/u 48.0', ml: '-138' },
-  { book: 'Book C', spread: '-3.0', total: 'o/u 49.0', ml: '-145' },
+  { book: 'Book A', spread: 'LAL -2.5', total: 'o/u 224.5', ml: '-128' },
+  { book: 'Book B', spread: 'NYK +2.5', total: 'o/u 225.0', ml: '+108' },
+  { book: 'Book C', spread: 'LAL -3.0', total: 'o/u 224.0', ml: '-132' },
+];
+
+const NHL_GAME_LINES = [
+  { book: 'Book A', spread: 'EDM -1.5', total: 'o/u 6.5', ml: '-142' },
+  { book: 'Book B', spread: 'EDM -1.0', total: 'o/u 6.5', ml: '-138' },
+  { book: 'Book C', spread: 'EDM -1.5', total: 'o/u 6.0', ml: '-145' },
+];
+
+const MLB_GAME_LINES = [
+  { book: 'Book A', spread: 'LAD -1.5', total: 'o/u 8.0', ml: '-165' },
+  { book: 'Book B', spread: 'LAD -1.5', total: 'o/u 8.5', ml: '-162' },
+  { book: 'Book C', spread: 'LAD -2.5', total: 'o/u 8.0', ml: '-158' },
 ];
 
 const PLAYER_PROP_GROUPS: {
@@ -18,30 +31,30 @@ const PLAYER_PROP_GROUPS: {
   rows: { market: string; a: string; b: string; c: string }[];
 }[] = [
   {
-    title: 'Points (PPG-style game lines)',
-    subtitle: 'Season averages vs tonight’s posted O/U — illustrative only.',
+    title: 'NBA · points',
+    subtitle: 'Regular-season props — stars on tonight’s slate (illustrative).',
     rows: [
-      { market: 'L. James o/u 24.5 pts', a: 'o -115', b: 'o -110', c: 'o -118' },
-      { market: 'S. Curry o/u 28.5 pts', a: 'u -108', b: 'u -112', c: 'u -105' },
-      { market: 'J. Tatum o/u 26.5 pts', a: 'o -105', b: 'o -108', c: 'o -102' },
+      { market: 'S. Gilgeous-Alexander o/u 31.5 pts', a: 'o -115', b: 'o -112', c: 'o -118' },
+      { market: 'L. Dončić o/u 28.5 pts', a: 'u -108', b: 'u -110', c: 'u -105' },
+      { market: 'J. Tatum o/u 27.5 pts', a: 'o -105', b: 'o -108', c: 'o -102' },
     ],
   },
   {
-    title: 'Rebounds & assists',
+    title: 'NBA · rebounds, assists, threes',
     subtitle: 'Same player, different books — spot the soft number.',
     rows: [
-      { market: 'G. Antetokounmpo o/u 11.5 reb', a: 'o -120', b: 'o -115', c: 'o -125' },
+      { market: 'V. Wembanyama o/u 10.5 reb', a: 'o -120', b: 'o -115', c: 'o -125' },
       { market: 'N. Jokić o/u 9.5 ast', a: 'u -112', b: 'u -108', c: 'u -115' },
-      { market: 'L. Dončić o/u 8.5 ast', a: 'o -118', b: 'o -122', c: 'o -114' },
+      { market: 'S. Curry o/u 4.5 3PM', a: 'o -128', b: 'o -125', c: 'o -130' },
     ],
   },
   {
-    title: 'Threes, combos & more',
-    subtitle: 'Props beyond the box score — compare before you lock in.',
+    title: 'MLB · early-season props',
+    subtitle: 'Opening-week lines — hits, Ks, and totals (illustrative).',
     rows: [
-      { market: 'K. Thompson o/u 3.5 3PM', a: 'o -130', b: 'o -125', c: 'o -128' },
-      { market: 'D. Lillard 25+ pts + win', a: '+185', b: '+192', c: '+178' },
-      { market: 'A. Edwards alt pts 30+', a: '+145', b: '+140', c: '+150' },
+      { market: 'S. Ohtani o/u 7.5 Ks', a: 'o -115', b: 'o -110', c: 'o -118' },
+      { market: 'A. Judge o/u 0.5 HR', a: 'o -105', b: 'o -108', c: 'o -102' },
+      { market: 'J. Soto o/u 1.5 hits', a: 'o -125', b: 'o -122', c: 'o -128' },
     ],
   },
 ];
@@ -56,13 +69,13 @@ export default function LinesScreen() {
         <DisclaimerBanner />
         <Text style={[styles.headline, { color: c.text }]}>Odds & line types</Text>
         <Text style={[styles.sub, { color: c.textSecondary }]}>
-          Game lines, player props (PPG-style points, boards, dimes, threes), and alts — mocked
-          prices to show how Line Logic compares markets side by side.
+          Spring in-season markets: NBA, NHL, and MLB (NFL returns in the fall). Mocked prices show how
+          Line Logic compares books side by side — not live feeds.
         </Text>
 
-        <Text style={[styles.sectionTitle, { color: c.text }]}>Game lines</Text>
+        <Text style={[styles.sectionTitle, { color: c.text }]}>NBA game lines</Text>
         <Text style={[styles.sectionSub, { color: c.textSecondary }]}>
-          Spread, total, moneyline — same matchup, different numbers.
+          Lakers @ Knicks — spread, total, moneyline (sample Tuesday night board).
         </Text>
 
         <RNView style={[styles.table, { backgroundColor: c.surface, borderColor: c.border }]}>
@@ -74,6 +87,54 @@ export default function LinesScreen() {
           </RNView>
           {GAME_LINES.map((row) => (
             <RNView key={row.book} style={[styles.tr, { borderBottomColor: c.border }]}>
+              <Text style={[styles.td, { color: c.text, flex: 1.2, fontWeight: '600' }]}>
+                {row.book}
+              </Text>
+              <Text style={[styles.td, { color: c.text }]}>{row.spread}</Text>
+              <Text style={[styles.td, { color: c.text }]}>{row.total}</Text>
+              <Text style={[styles.td, { color: c.accent, fontWeight: '700' }]}>{row.ml}</Text>
+            </RNView>
+          ))}
+        </RNView>
+
+        <Text style={[styles.sectionTitle, { color: c.text, marginTop: 4 }]}>NHL game lines</Text>
+        <Text style={[styles.sectionSub, { color: c.textSecondary }]}>
+          Oilers vs opponent — puck line and total (late-season sample).
+        </Text>
+
+        <RNView style={[styles.table, { backgroundColor: c.surface, borderColor: c.border }]}>
+          <RNView style={[styles.tr, styles.trHead, { borderBottomColor: c.border }]}>
+            <Text style={[styles.th, { color: c.muted, flex: 1.2 }]}>Book</Text>
+            <Text style={[styles.th, { color: c.muted }]}>Spread</Text>
+            <Text style={[styles.th, { color: c.muted }]}>Total</Text>
+            <Text style={[styles.th, { color: c.muted }]}>ML</Text>
+          </RNView>
+          {NHL_GAME_LINES.map((row) => (
+            <RNView key={`nhl-${row.book}`} style={[styles.tr, { borderBottomColor: c.border }]}>
+              <Text style={[styles.td, { color: c.text, flex: 1.2, fontWeight: '600' }]}>
+                {row.book}
+              </Text>
+              <Text style={[styles.td, { color: c.text }]}>{row.spread}</Text>
+              <Text style={[styles.td, { color: c.text }]}>{row.total}</Text>
+              <Text style={[styles.td, { color: c.accent, fontWeight: '700' }]}>{row.ml}</Text>
+            </RNView>
+          ))}
+        </RNView>
+
+        <Text style={[styles.sectionTitle, { color: c.text, marginTop: 4 }]}>MLB game lines</Text>
+        <Text style={[styles.sectionSub, { color: c.textSecondary }]}>
+          Dodgers favorite run line — opening month style totals (illustrative).
+        </Text>
+
+        <RNView style={[styles.table, { backgroundColor: c.surface, borderColor: c.border }]}>
+          <RNView style={[styles.tr, styles.trHead, { borderBottomColor: c.border }]}>
+            <Text style={[styles.th, { color: c.muted, flex: 1.2 }]}>Book</Text>
+            <Text style={[styles.th, { color: c.muted }]}>Spread</Text>
+            <Text style={[styles.th, { color: c.muted }]}>Total</Text>
+            <Text style={[styles.th, { color: c.muted }]}>ML</Text>
+          </RNView>
+          {MLB_GAME_LINES.map((row) => (
+            <RNView key={`mlb-${row.book}`} style={[styles.tr, { borderBottomColor: c.border }]}>
               <Text style={[styles.td, { color: c.text, flex: 1.2, fontWeight: '600' }]}>
                 {row.book}
               </Text>
@@ -116,9 +177,9 @@ export default function LinesScreen() {
 
         <RNView style={[styles.moveCard, { backgroundColor: c.surface, borderColor: c.border }]}>
           <RNView style={styles.moveHeader}>
-            <Text style={[styles.moveEvent, { color: c.text }]}>Spread · Chiefs @ Bills</Text>
+            <Text style={[styles.moveEvent, { color: c.text }]}>Spread · Lakers @ Knicks (NBA)</Text>
             <RNView style={[styles.pill, { backgroundColor: c.positive + '22' }]}>
-              <Text style={[styles.pillText, { color: c.positive }]}>Toward Bills</Text>
+              <Text style={[styles.pillText, { color: c.positive }]}>Toward Lakers</Text>
             </RNView>
           </RNView>
           <RNView style={styles.sparkRow}>
@@ -136,14 +197,14 @@ export default function LinesScreen() {
             ))}
           </RNView>
           <RNView style={styles.moveFooter}>
-            <Text style={[styles.moveMeta, { color: c.muted }]}>Open -1.5 → Now -2.5</Text>
+            <Text style={[styles.moveMeta, { color: c.muted }]}>Open NYK -1.5 → Now LAL -2.5</Text>
             <Text style={[styles.moveMeta, { color: c.muted }]}>Updated 2m ago</Text>
           </RNView>
         </RNView>
 
         <RNView style={[styles.moveCard, { backgroundColor: c.surface, borderColor: c.border }]}>
           <RNView style={styles.moveHeader}>
-            <Text style={[styles.moveEvent, { color: c.text }]}>Prop · Curry o/u 28.5 pts</Text>
+            <Text style={[styles.moveEvent, { color: c.text }]}>Prop · SGA o/u 31.5 pts (NBA)</Text>
             <RNView style={[styles.pill, { backgroundColor: c.accent + '22' }]}>
               <Text style={[styles.pillText, { color: c.accent }]}>Toward over</Text>
             </RNView>
@@ -163,7 +224,7 @@ export default function LinesScreen() {
             ))}
           </RNView>
           <RNView style={styles.moveFooter}>
-            <Text style={[styles.moveMeta, { color: c.muted }]}>Open 27.5 → Now 28.5</Text>
+            <Text style={[styles.moveMeta, { color: c.muted }]}>Open 30.5 → Now 31.5</Text>
             <Text style={[styles.moveMeta, { color: c.muted }]}>Updated 18m ago</Text>
           </RNView>
         </RNView>

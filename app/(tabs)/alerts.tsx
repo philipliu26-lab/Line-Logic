@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DisclaimerBanner } from '@/components/DisclaimerBanner';
 import { Text } from '@/components/Themed';
 import { useApp } from '@/context/AppContext';
-import { MOCK_ALERTS } from '@/data/alerts';
+import { LINE_ALERTS } from '@/data/alerts';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 
@@ -46,7 +46,7 @@ export default function AlertsScreen() {
           </RNView>
         )}
 
-        {MOCK_ALERTS.map((a) => (
+        {LINE_ALERTS.map((a) => (
           <RNView
             key={a.id}
             style={[styles.card, { backgroundColor: c.surface, borderColor: c.border, opacity: showRealtime ? 1 : 0.45 }]}

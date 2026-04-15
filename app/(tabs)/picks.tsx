@@ -14,6 +14,7 @@ import { DisclaimerBanner } from '@/components/DisclaimerBanner';
 import { Text } from '@/components/Themed';
 import { useApp } from '@/context/AppContext';
 import { PRESENTATION_SHOWCASE_MODE } from '@/constants/presentation';
+import { PAST_PICK_RESULTS, getPastPickStats } from '@/data/pastPicks';
 import { MOCK_PICKS } from '@/data/picks';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -40,7 +41,9 @@ export default function PicksScreen() {
   const [busy, setBusy] = useState(false);
   const [revealPressed, setRevealPressed] = useState(false);
   const [detailPressedId, setDetailPressedId] = useState<string | null>(null);
+  const [showAllGraded, setShowAllGraded] = useState(false);
 
+  const pastStats = getPastPickStats();
   const cap = dailyPickCap;
   /** Slots unlocked from the top of the list; never above today’s cap (storage is clamped on load). */
   const slotsFromUsage = Math.min(pickUsage?.revealedCount ?? 0, cap);
@@ -142,7 +145,80 @@ export default function PicksScreen() {
           </RNView>
         )}
 
-        <Text style={[styles.sectionLabel, { color: c.muted }]}>Featured upcoming games</Text>
+        <RNView style={styles.sectionHeaderRow}>
+          <Text style={[styles.sectionLabel, { color: c.muted }]}>Recent graded picks</Text>
+          <Pressable
+            onPress={() => setShowAllGraded((v) => !v)}
+            style={({ pressed }) => [styles.sectionToggle, { opacity: pressed ? 0.85 : 1 }]}
+            accessibilityRole="button"
+            accessibilityLabel={showAllGraded ? 'Show fewer graded picks' : 'Show all graded picks'}>
+            <Text style={[styles.sectionToggleText, { color: c.accent }]}>
+              {showAllGraded ? 'Show less' : `Show all (${PAST_PICK_RESULTS.length})`}
+            </Text>
+            <FontAwesome
+              name={showAllGraded ? 'chevron-up' : 'chevron-down'}
+              size={12}
+              color={c.accent}
+            />
+          </Pressable>
+        </RNView>
+        <RNView style={[styles.trackCard, { backgroundColor: c.surface, borderColor: c.border }]}>
+          <RNView style={styles.trackHeader}>
+            <RNView>
+              <Text style={[styles.trackPct, { color: c.accent }]}>{pastStats.pct}%</Text>
+              <Text style={[styles.trackSub, { color: c.textSecondary }]}>
+                {pastStats.wins} of {pastStats.total} picks correct
+              </Text>
+            </RNView>
+            <RNView style={[styles.trackBadge, { backgroundColor: c.background }]}>
+              <Text style={[styles.trackBadgeText, { color: c.muted }]}>Last {pastStats.total} games</Text>
+            </RNView>
+          </RNView>
+          {(showAllGraded ? PAST_PICK_RESULTS : PAST_PICK_RESULTS.slice(0, 5)).map((row) => (
+            <RNView
+              key={row.id}
+              style={[styles.pastRow, { borderTopColor: c.border }]}
+              accessibilityLabel={`${row.event}, ${row.pick}, ${row.correct ? 'correct' : 'incorrect'}`}>
+              <RNView style={styles.pastRowLeft}>
+                <Text style={[styles.pastDate, { color: c.muted }]}>{row.dateLabel}</Text>
+                <RNView style={[styles.pastSport, { backgroundColor: c.background }]}>
+                  <Text style={[styles.pastSportText, { color: c.accent }]}>{row.sport}</Text>
+                </RNView>
+              </RNView>
+              <RNView style={styles.pastRowMid}>
+                <Text style={[styles.pastEvent, { color: c.text }]} numberOfLines={1}>
+                  {row.event}
+                </Text>
+                <Text style={[styles.pastPick, { color: c.textSecondary }]} numberOfLines={1}>
+                  {row.pick}
+                </Text>
+              </RNView>
+              <FontAwesome
+                name={row.correct ? 'check-circle' : 'times-circle'}
+                size={18}
+                color={row.correct ? c.positive : c.negative}
+                accessibilityLabel={row.correct ? 'Correct' : 'Incorrect'}
+              />
+            </RNView>
+          ))}
+          {!showAllGraded && PAST_PICK_RESULTS.length > 5 ? (
+            <Pressable
+              onPress={() => setShowAllGraded(true)}
+              style={({ pressed }) => [styles.showMoreRow, { borderTopColor: c.border, opacity: pressed ? 0.85 : 1 }]}
+              accessibilityRole="button"
+              accessibilityLabel="Show all recent graded picks">
+              <Text style={[styles.showMoreText, { color: c.accent }]}>
+                Show more
+              </Text>
+              <FontAwesome name="chevron-down" size={12} color={c.accent} />
+            </Pressable>
+          ) : null}
+          <Text style={[styles.trackFoot, { color: c.muted }]}>
+            Per-game results are illustrative for this demo — not a record of real-money performance.
+          </Text>
+        </RNView>
+
+        <Text style={[styles.sectionLabel, { color: c.muted, marginTop: 8 }]}>Featured upcoming games</Text>
 
         {MOCK_PICKS.map((p, index) => {
           const unlocked = index < effectiveSlotsRevealed;
@@ -181,6 +257,15 @@ export default function PicksScreen() {
                     accessibilityLabel={`Open details for ${p.event}`}>
                     <Text style={[styles.detailBtnText, { color: c.accent }]}>View proof & detail</Text>
                     <FontAwesome name="chevron-right" size={12} color={c.accent} />
+                  </Pressable>
+                  <Pressable
+                    onPress={() => router.push(`/game/${p.id}`)}
+                    style={[styles.gameBtn, { borderColor: c.border, backgroundColor: c.background }]}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Open rosters and season stats for ${p.event}`}>
+                    <FontAwesome name="users" size={14} color={c.accent} />
+                    <Text style={[styles.gameBtnText, { color: c.text }]}>Rosters & season stats</Text>
+                    <FontAwesome name="chevron-right" size={12} color={c.muted} />
                   </Pressable>
                 </>
               ) : (
@@ -247,6 +332,30 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
   },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  sectionToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 2,
+  },
+  sectionToggleText: { fontSize: 12, fontWeight: '800' },
+  showMoreRow: {
+    borderTopWidth: 1,
+    paddingTop: 12,
+    marginTop: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  showMoreText: { fontSize: 13, fontWeight: '900' },
   linkBtnText: { fontWeight: '800', fontSize: 14 },
   sectionLabel: {
     fontSize: 11,
@@ -254,6 +363,50 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
     marginBottom: 10,
     textTransform: 'uppercase',
+  },
+  trackCard: {
+    borderRadius: 14,
+    borderWidth: 1,
+    marginBottom: 18,
+    overflow: 'hidden',
+  },
+  trackHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 10,
+  },
+  trackPct: { fontSize: 36, fontWeight: '800', lineHeight: 40 },
+  trackSub: { fontSize: 14, fontWeight: '600', marginTop: 4 },
+  trackBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  trackBadgeText: { fontSize: 11, fontWeight: '700' },
+  pastRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    gap: 10,
+  },
+  pastRowLeft: { width: 76, gap: 4 },
+  pastDate: { fontSize: 12, fontWeight: '700' },
+  pastSport: { alignSelf: 'flex-start', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  pastSportText: { fontSize: 10, fontWeight: '800' },
+  pastRowMid: { flex: 1, minWidth: 0 },
+  pastEvent: { fontSize: 13, fontWeight: '700' },
+  pastPick: { fontSize: 12, marginTop: 2 },
+  trackFoot: {
+    fontSize: 11,
+    lineHeight: 16,
+    paddingHorizontal: 14,
+    paddingBottom: 12,
+    paddingTop: 4,
   },
   pickCard: {
     borderRadius: 14,
@@ -285,6 +438,17 @@ const styles = StyleSheet.create({
     marginTop: 14,
   },
   detailBtnText: { fontSize: 14, fontWeight: '800' },
+  gameBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  gameBtnText: { flex: 1, fontSize: 14, fontWeight: '700' },
   lockedBody: { alignItems: 'center', paddingVertical: 20 },
   lockedTitle: { fontSize: 15, fontWeight: '800', marginTop: 10 },
   lockedSub: { fontSize: 13, textAlign: 'center', marginTop: 6, paddingHorizontal: 8, lineHeight: 18 },

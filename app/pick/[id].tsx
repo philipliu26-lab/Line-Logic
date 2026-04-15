@@ -66,6 +66,15 @@ export default function PickDetailScreen() {
           ) : null}
           <Text style={[styles.pickLine, { color: c.text }]}>{pick.pick}</Text>
           <Text style={[styles.note, { color: c.textSecondary }]}>{pick.note}</Text>
+          <Pressable
+            onPress={() => router.push(`/game/${pick.id}`)}
+            style={[styles.gameLink, { borderColor: c.border, backgroundColor: c.background }]}
+            accessibilityRole="button"
+            accessibilityLabel="Open rosters, season stats, and injury list for this game">
+            <FontAwesome name="users" size={14} color={c.accent} />
+            <Text style={[styles.gameLinkText, { color: c.text }]}>Rosters & season stats</Text>
+            <FontAwesome name="chevron-right" size={12} color={c.muted} />
+          </Pressable>
         </RNView>
 
         {showPro ? (
@@ -225,6 +234,17 @@ const styles = StyleSheet.create({
   scheduledFor: { fontSize: 13, fontWeight: '600', marginBottom: 8 },
   pickLine: { fontSize: 22, fontWeight: '800', marginBottom: 8 },
   note: { fontSize: 14, lineHeight: 20 },
+  gameLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  gameLinkText: { flex: 1, fontSize: 14, fontWeight: '700' },
   card: { borderRadius: 14, borderWidth: 1, padding: 14, marginBottom: 16 },
   cardTitle: { fontSize: 16, fontWeight: '800' },
   cardSub: { fontSize: 13, lineHeight: 19, marginTop: 8 },

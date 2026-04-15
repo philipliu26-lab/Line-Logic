@@ -91,6 +91,14 @@ function RootLayoutNav() {
             headerLeft: (props) => <StackHeaderLeading navigationProps={props} />,
           }}
         />
+        <Stack.Screen
+          name="game/[id]"
+          options={{
+            title: 'Game rosters',
+            headerBackTitle: 'Back',
+            headerLeft: (props) => <StackHeaderLeading navigationProps={props} />,
+          }}
+        />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'About' }} />
         <Stack.Screen
           name="purchase/[tier]"
